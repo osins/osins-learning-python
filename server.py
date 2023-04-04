@@ -50,12 +50,15 @@ def handle_message(message):
         print(f"Error: {e}")
 
 
+@socketio.on('login')
+def handle_response(message):
+    emit('invite', 'Do you want to join the game? [y/n]')
+
 @socketio.on('join')
 def handle_response(message):
     global clients
 
     uuid, val = message.split(':')
-
     print(f"uuid:{uuid}, val:{val}")
 
     if val == 'y':

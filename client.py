@@ -7,15 +7,11 @@ sio = socketio.Client()
 # 定义连接成功事件处理函数
 
 
-def callback():
-    print("emit complete")
-
-
 @sio.event
 def connect():
     global uuid
     print('Connected to server.')
-    sio.emit(event='response', data=f"{uuid}:join:y", callback=callback)
+    sio.emit('login', f"{uuid}")
 
 # 定义邀请消息事件处理函数
 
@@ -26,7 +22,7 @@ def handle_invite(message):
     response = input()
 
     # 向服务器发送回复消息
-    sio.emit('response', f"{uuid}:join:{response}")
+    sio.emit('join', f"{uuid}:{response}")
 
 # 定义服务器发送的消息事件处理函数
 
