@@ -1,0 +1,11 @@
+version: '3.9'
+services:
+  server:
+    build: 
+      context: ./
+      dockerfile: dockerfile
+    ports:
+      - 10086:10086
+    volumes:
+      - ./server.py:/working/server.py
+  

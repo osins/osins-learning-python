@@ -8,6 +8,23 @@ client_data = {}
 def sort_numbers(numbers):
     return sorted(numbers)
 
+def game(message):
+    # 将 UUID 和数字存储到字典中
+    client_data[uuid] = int(message)
+
+    # 如果字典中存储了三个不同 UUID 的数字，说明一轮游戏结束
+    if len(client_data) == 3:
+        # 调用排序函数对数字进行排序
+        sorted_numbers = sort_numbers(client_data.values())
+
+        # 将排序后的数字发送给每个客户端
+        for client_uuid, client_socket in clients.items():
+            result = ':'.join([client_uuid, str(sorted_numbers)])
+            client_socket.send(result.encode())
+
+        # 清空客户端数据字典
+        client_data = {}
+                
 # 处理客户端连接请求
 def handle_client(client_socket, address):
     global client_data
@@ -19,24 +36,13 @@ def handle_client(client_socket, address):
                 break
 
             # 解析消息中的 UUID 和数字
-            uuid, number = data.split(':')
-
-            # 将 UUID 和数字存储到字典中
-            client_data[uuid] = int(number)
-
-            # 如果字典中存储了三个不同 UUID 的数字，说明一轮游戏结束
-            if len(client_data) == 3:
-                # 调用排序函数对数字进行排序
-                sorted_numbers = sort_numbers(client_data.values())
-
-                # 将排序后的数字发送给每个客户端
-                for client_uuid, client_socket in clients.items():
-                    result = ':'.join([client_uuid, str(sorted_numbers)])
-                    client_socket.send(result.encode())
-
-                # 清空客户端数据字典
-                client_data = {}
-
+            uuid, op, message = data.split(':')
+            
+            print('from client message: ', uuid, op, message)
+            
+            if(op == 'join'):
+                client_socket.send('start')
+                
         except:
             break
 
