@@ -1,38 +1,72 @@
-import socket
+import socketio
 import uuid
 
-# 获取客户端的 UUID
-client_uuid = str(uuid.uuid4())
+uuid = uuid.uuid4()
+sio = socketio.Client()
 
-# 连接到服务端
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect(('127.0.0.1', 10086))
+# 定义连接成功事件处理函数
 
-# 发送游戏加入请求
-print("Do you want to join the game? (y/n)")
-answer = input().strip().lower()
-if answer == 'n':
-    client_socket.close()
-    exit()
-elif answer == 'y':
-    client_socket.send((client_uuid+":join").encode())
 
-def input():
-    print("Please enter a number:")
-    number = input().strip()
-    if not number.isdigit():
-        print("Invalid input. Please enter a number.")
-    
-# 接收用户输入并发送给服务端
-while True:
-    # 等待服务端的游戏开始通知
-    data = client_socket.recv(1024).decode()
-    print('recv: ', data)
-    
-    if data != "start":
-        client_socket.close()
-        exit()
-    
-    
+def callback():
+    print("emit complete")
 
-    # 将 UUID 和数字用冒号分隔符连接起来，并发送给服务端
+
+@sio.event
+def connect():
+    global uuid
+    print('Connected to server.')
+    sio.emit(event='response', data=f"{uuid}:join:y", callback=callback)
+
+# 定义邀请消息事件处理函数
+
+
+@sio.on('invite')
+def handle_invite(message):
+    print(message)
+    response = input()
+
+    # 向服务器发送回复消息
+    sio.emit('response', f"{uuid}:join:{response}")
+
+# 定义服务器发送的消息事件处理函数
+
+
+@sio.on('message')
+def handle_message(message):
+    print('message: ', message)
+
+    if ':' not in message:
+        return
+
+    uuid, op, val = message.split(':')
+
+    if op == 'input':
+        # 如果服务器发送的消息为请求输入数字的消息，则提示用户输入数字
+        number = int(input(val))
+        sio.emit('message', f"{uuid}:in:{number}")
+
+    elif op == 'result':
+        # 如果服务器发送的消息为本轮游戏排序结果，则输出结果
+        print(f"The sorted numbers are: {val}")
+
+# 定义连接错误事件处理函数
+
+
+@sio.event
+def connect_error():
+    print("Connection failed.")
+
+# 定义连接断开事件处理函数
+
+
+@sio.event
+def disconnect():
+    print("Disconnected.")
+
+
+if __name__ == '__main__':
+    # 连接服务器
+    sio.connect('http://localhost:10086')
+
+    # 等待连接成功
+    sio.wait()

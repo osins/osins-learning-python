@@ -1,75 +1,84 @@
-import socket
-import threading
+from flask import Flask, render_template
+from flask_socketio import SocketIO, emit
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app)
+
+# 存储客户端 UUID 和是否接受邀请的标志位
+clients = {}
 
 # 存储客户端 UUID 和数字的字典
 client_data = {}
 
 # 定义排序函数
+
+
 def sort_numbers(numbers):
     return sorted(numbers)
 
-def game(message):
-    # 将 UUID 和数字存储到字典中
-    client_data[uuid] = int(message)
+# 处理 WebSocket 连接
 
-    # 如果字典中存储了三个不同 UUID 的数字，说明一轮游戏结束
-    if len(client_data) == 3:
-        # 调用排序函数对数字进行排序
-        sorted_numbers = sort_numbers(client_data.values())
 
-        # 将排序后的数字发送给每个客户端
-        for client_uuid, client_socket in clients.items():
-            result = ':'.join([client_uuid, str(sorted_numbers)])
-            client_socket.send(result.encode())
-
-        # 清空客户端数据字典
-        client_data = {}
-                
-# 处理客户端连接请求
-def handle_client(client_socket, address):
+@socketio.on('number')
+def handle_message(message):
+    global clients
     global client_data
-    while True:
-        try:
-            # 接收客户端发送的消息
-            data = client_socket.recv(1024).decode()
-            if not data:
-                break
 
-            # 解析消息中的 UUID 和数字
-            uuid, op, message = data.split(':')
-            
-            print('from client message: ', uuid, op, message)
-            
-            if(op == 'join'):
-                client_socket.send('start')
+    try:
+        print("number:", message)
+
+        if ':' not in message:
+            return
+
+        uuid, val = message.split(':')
+
+        client_data[uuid] = int(val)
+
+        # 如果字典中存储了三个不同 UUID 的数字，说明一轮游戏结束
+        if len(client_data) == 3:
+            # 调用排序函数对数字进行排序
+            sorted_numbers = sort_numbers(client_data.values())
+
+            # 将排序后的数字发送给每个客户端
+            emit('message', sorted_numbers)
                 
-        except:
-            break
+            # 清空客户端数据字典
+            client_data = {}
 
-    # 关闭客户端连接
-    client_socket.close()
+    except Exception as e:
+        print(f"Error: {e}")
+
+
+@socketio.on('join')
+def handle_response(message):
+    global clients
+
+    uuid, val = message.split(':')
+
+    print(f"uuid:{uuid}, val:{val}")
+
+    if val == 'y':
+        emit('message', "wating")
+
+        # 标记客户端已接受邀请
+        clients[uuid] = None
+
+        # 如果所有客户端都接受了邀请，向每个客户端发送请求输入数字的消息
+        if all(clients.values()):
+            for client_uuid in clients.keys():
+                emit('message', 'Please input a number')
+
+    elif val == 'n':
+        # 如果客户端拒绝了邀请，则关闭连接
+        emit('message', 'You have refused to join the game.')
+        socketio.close_room(uuid)
+
+    else:
+        # 如果接收到的消息无效，则发送错误提示
+        emit('message', 'Invalid message!', room=uuid)
+
 
 # 监听客户端连接请求
-def accept_clients():
-    global clients
-    while True:
-        client_socket, address = server_socket.accept()
-        print(f"New connection from {address}")
-        # 创建一个新的线程来处理客户端连接
-        client_thread = threading.Thread(target=handle_client, args=(client_socket, address))
-        client_thread.start()
-
-# 主函数
-if __name__ == "__main__":
-    # 创建 TCP 套接字并绑定 IP 地址和端口号
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(('127.0.0.1', 10086))
-
-    # 开始监听连接请求
-    server_socket.listen()
-
-    # 等待客户端连接
-    clients = {}
-    accept_thread = threading.Thread(target=accept_clients)
-    accept_thread.start()
-    print("service start")
+if __name__ == '__main__':
+    socketio.run(app, host='0.0.0.0', port=8000, debug=True)

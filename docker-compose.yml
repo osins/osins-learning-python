@@ -5,7 +5,7 @@ services:
       context: ./
       dockerfile: dockerfile
     ports:
-      - 10086:10086
+      - 10086:8000
     volumes:
       - ./server.py:/working/server.py
   
