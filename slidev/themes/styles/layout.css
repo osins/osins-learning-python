@@ -1,0 +1,41 @@
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: #000;
+}
+
+#page-root{
+  border: none;
+}
+
+.slide-container{
+  border: none;
+}
+
+.slide-content{
+  background-color: #000;
+  border-width: 0px;
+}
+
+.place-content-center{
+  background-color: #000;
+  color:#eeeeee;
+}
+
+.place-content-center h1,.place-content-center h2{
+  text-align: center;
+  font-size: 60px;
+}
+
+.place-content-center p{
+  text-align: center;
+}
+
+.place-content-center li{
+  text-align: center;
+}
+
+.slidev-code{
+  padding: 10px !important;
+  background-color: #fff !important;
+  color:#eeeeee !important;
+}

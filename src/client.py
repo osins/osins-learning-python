@@ -11,7 +11,7 @@ sio = socketio.Client()
 def connect():
     global uuid
     print('Connected to server.')
-    sio.emit('login', f"{uuid}")
+    sio.emit('join', f"{uuid}")
 
 # 定义邀请消息事件处理函数
 

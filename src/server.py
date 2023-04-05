@@ -42,21 +42,19 @@ def handle_message(message):
 
             # 将排序后的数字发送给每个客户端
             emit('message', sorted_numbers)
-                
+
             # 清空客户端数据字典
             client_data = {}
 
     except Exception as e:
         print(f"Error: {e}")
 
-
-@socketio.on('login')
-def handle_response(message):
-    emit('invite', 'Do you want to join the game? [y/n]')
-
 @socketio.on('join')
 def handle_response(message):
     global clients
+    if message == 'connection':
+        emit('invite', 'Do you want to join the game? [y/n]')
+        return
 
     uuid, val = message.split(':')
     print(f"uuid:{uuid}, val:{val}")
