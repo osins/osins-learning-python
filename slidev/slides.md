@@ -130,5 +130,3 @@ Computer chose paper
 Tie!
 Play again? (y/n): n
 ```
-
----
