@@ -1,7 +1,3 @@
-# Message Game
+# Python 教学
 
-## insert client
-
-```bash
-pip install "python-socketio[client]"
-```
+课程地址 *[Markdown Guide](osins-learning-python.vercel.app)*.
