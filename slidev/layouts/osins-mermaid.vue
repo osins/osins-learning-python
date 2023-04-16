@@ -1,6 +1,6 @@
 <!-- default.vue -->
 <template>
-  <div class="osins-code">
+  <div class="osins-mermaid">
     <slot />
   </div>
 </template>
@@ -15,18 +15,18 @@
     width: 100% !important;
   }
 
-  .osins-code{
+  .osins-mermaid{
     padding: 10px;
     font-size: 9px !important;
     line-height: 1.2;
+    overflow:scroll;
     h1,h2{
       font-size: 24px;
       margin-bottom: 10px;
     }
-    .language-python{
-      code{
-        font-size: 12px;
-      }
+    .mermaid{
+      margin: auto;
+      font-size: 12px;
     }
   }
 </style>

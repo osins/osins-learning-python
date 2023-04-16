@@ -14,10 +14,56 @@ layout: center
 
 # 程序流程
 
-- 程序随机生成“剪刀”、“石头”、“布”三个选项中的一个
-- 用户输入“剪刀”、“石头”、“布”中的一个选项
-- 程序与用户的选择进行比较，输出比较结果
-- 循环进行，直到用户退出游戏
+- 开始游戏
+- 提示选择选项
+- 输入选项数字
+- 计算机随机选择选项
+- 判断游戏结果
+- 输出结果给用户
+- 询问是否再玩一局
+- 输入 y/n 
+- 程序->>用户: 结束游戏
+
+---
+theme: ./themes
+layout: osins-mermaid
+---
+
+# 程序流程图
+
+```mermaid
+%%{
+  init: {
+    'theme': 'defualt',
+    'themeVariables': {
+        'actorBkg': '#0072E5',
+        'actorTextColor': '#F0F7FF',
+        "actorBorder": "#004C99",
+        "actorLineColor": "#004C99",
+        "signalColor": "#004C99",
+        "signalTextColor": "#004C99",
+        "labelBoxBkgColor": "#004C99",
+        "labelBoxBorderColor": "#F0F7FF",
+        "labelTextColor": "#F0F7FF",
+        "loopTextColor": "#F0F7FF"
+    }
+  }
+}%%
+sequenceDiagram
+    participant 用户
+    participant 程序
+    用户->>程序: 开始游戏
+    loop
+        程序->>用户: 提示选择选项
+        用户->>程序: 输入选项数字
+        程序->>程序: 计算机随机选择选项
+        程序->>程序: 判断游戏结果
+        程序->>用户: 输出结果给用户
+        程序->>用户: 询问是否再玩一局
+        用户-->>程序: 输入 y/n
+    end
+    程序->>用户: 结束游戏
+```
   
 ---
 theme: ./themes
@@ -26,8 +72,35 @@ layout: center
   
 ## 游戏规则
 
-- 剪刀胜利石头，石头胜利布，布胜利剪刀
-- 如果双方选择一样，即为平局
+```mermaid
+flowchart LR
+    用户:剪刀-- 石头胜利 ---程序:石头
+```
+
+```mermaid
+flowchart LR
+    用户:石头-- 布胜利 ---程序:布
+```
+
+```mermaid
+flowchart LR
+    用户:布-- 剪刀胜利 ---程序:剪刀
+```
+
+```mermaid
+flowchart LR
+    用户:剪刀-- 平局 ---程序:剪刀
+```
+
+```mermaid
+flowchart LR
+    用户:石头-- 平局 ---程序:石头
+```
+
+```mermaid
+flowchart LR
+    用户:布-- 平局 ---程序:布
+```
 
 ---
 theme: ./themes
